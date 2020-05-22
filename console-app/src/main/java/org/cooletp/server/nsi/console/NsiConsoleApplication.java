@@ -1,10 +1,18 @@
 package org.cooletp.server.nsi.console;
 
 import lombok.extern.slf4j.Slf4j;
+import org.cooletp.server.nsi.console.cli.CliParser;
+import org.cooletp.server.nsi.console.exception.CliParseException;
+import org.cooletp.server.nsi.console.exception.FtpClientException;
+import org.cooletp.server.nsi.console.ftp.NsiFtpLoader;
+import org.cooletp.server.nsi.console.properties.NsiProperties;
+import org.cooletp.server.nsi.console.ftp.NsiLoaderFabric;
 import org.cooletp.server.nsi.core.NsiJpaConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Import;
 
 @Slf4j
@@ -12,19 +20,53 @@ import org.springframework.context.annotation.Import;
 @Import(
         NsiJpaConfiguration.class
 )
+@EnableConfigurationProperties(NsiProperties.class)
 public class NsiConsoleApplication implements CommandLineRunner {
+    private final NsiLoaderFabric nsiLoaderFabric;
+    private final CliParser parser;
+    private final NsiConfig config;
+
     public static void main(String[] args) {
-        log.info("STARTING THE APPLICATION!");
         SpringApplication.run(NsiConsoleApplication.class, args);
-        log.info("APPLICATION FINISHED");
+    }
+
+    @Autowired
+    public NsiConsoleApplication(NsiLoaderFabric nsiLoaderFabric, CliParser parser, NsiConfig config) {
+        this.nsiLoaderFabric = nsiLoaderFabric;
+        this.parser = parser;
+        this.config = config;
     }
 
     @Override
     public void run(String... args) throws Exception {
-        log.info("EXECUTING : command line runner");
+        try {
+            parser.parse(args);
 
-        for (int i = 0; i < args.length; ++i) {
-            log.info("args[{}]: {}", i, args[i]);
+            if(parser.isHelpCommand()) {
+                parser.showHelpMessage();
+            } else if(parser.isTypeCommand()) {
+                String nsiType = parser.getTypeValue();
+                boolean loadAll = parser.isLoadAll();
+
+                if(!config.isNsiTypeExists(nsiType)) {
+                    throw new CliParseException("Выбран неверный типа NSI справочника");
+                }
+
+                NsiFtpLoader loader = nsiLoaderFabric.getLoader(nsiType);
+                loader.open();
+                System.out.println(loader.listFiles("/out/nsi"));
+                loader.close();
+            } else {
+                throw new CliParseException("Необходимо указать что делать. Пустой запуск не разрешен!");
+            }
+        } catch (CliParseException ex) {
+            // oops, something went wrong
+            System.err.println( "Запуск не возможен.  Причина: " + ex.getMessage() + "\n\n" );
+            parser.showHelpMessage();
+        } catch (FtpClientException ex) {
+            System.err.println("Ошибка взаимодействия с FTP: " + ex.getMessage() + "\n\n");
         }
+
+
     }
 }
