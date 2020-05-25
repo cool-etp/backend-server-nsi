@@ -1,6 +1,12 @@
-package org.cooletp.server.nsi.console.cli;
+package org.cooletp.server.nsi.console.util;
 
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.cooletp.server.nsi.console.NsiConfig;
 import org.cooletp.server.nsi.console.exception.CliParseException;
 import org.cooletp.server.nsi.console.ftp.NsiLoaderFabric;
@@ -8,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Arrays;
 
 @Component
 public class CliParser {

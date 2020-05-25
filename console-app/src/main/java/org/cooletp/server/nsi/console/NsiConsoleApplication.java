@@ -1,7 +1,7 @@
 package org.cooletp.server.nsi.console;
 
 import lombok.extern.slf4j.Slf4j;
-import org.cooletp.server.nsi.console.cli.CliParser;
+import org.cooletp.server.nsi.console.util.CliParser;
 import org.cooletp.server.nsi.console.exception.CliParseException;
 import org.cooletp.server.nsi.console.exception.FtpClientException;
 import org.cooletp.server.nsi.console.ftp.NsiFtpLoader;
