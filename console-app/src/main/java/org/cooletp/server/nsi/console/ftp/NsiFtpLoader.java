@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.cooletp.server.nsi.console.exception.FtpClientException;
 
 import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,7 +24,7 @@ public class NsiFtpLoader {
         this.getClient().open();
     }
 
-    public Collection<String> listFiles(String path) throws FtpClientException {
+    public List<String> listFiles(String path) throws FtpClientException {
         String fullPath = rootPath + "/" + nsiPrefix;
 
         return getClient().listFiles(fullPath);

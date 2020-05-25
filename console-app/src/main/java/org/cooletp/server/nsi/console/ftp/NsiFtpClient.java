@@ -2,6 +2,7 @@ package org.cooletp.server.nsi.console.ftp;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPFileFilter;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -38,6 +40,8 @@ public class NsiFtpClient {
         try {
             ftpClient = new FTPClient();
 
+            ftpClient.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
+
             ftpClient.connect(config.getFtpServer(), config.getFtpPort());
 
             int reply = ftpClient.getReplyCode();
@@ -45,6 +49,8 @@ public class NsiFtpClient {
                 ftpClient.disconnect();
                 throw new IOException("Ошибка подключения к FTP серверу (код " + reply + ")");
             }
+
+            ftpClient.enterLocalPassiveMode();
 
             if (!ftpClient.login(config.getFtpUsername(), config.getFtpPassword())) {
                 reply = ftpClient.getReplyCode();
