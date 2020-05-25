@@ -42,13 +42,13 @@ public class NsiConsoleApplication implements CommandLineRunner {
         try {
             parser.parse(args);
 
-            if(parser.isHelpCommand()) {
+            if (parser.isHelpCommand()) {
                 parser.showHelpMessage();
-            } else if(parser.isTypeCommand()) {
+            } else if (parser.isTypeCommand()) {
                 String nsiType = parser.getTypeValue();
                 boolean loadAll = parser.isLoadAll();
 
-                if(!config.isNsiTypeExists(nsiType)) {
+                if (!config.isNsiTypeExists(nsiType)) {
                     throw new CliParseException("Выбран неверный типа NSI справочника");
                 }
 
@@ -61,7 +61,7 @@ public class NsiConsoleApplication implements CommandLineRunner {
             }
         } catch (CliParseException ex) {
             // oops, something went wrong
-            System.err.println( "Запуск не возможен.  Причина: " + ex.getMessage() + "\n\n" );
+            System.err.println("Запуск не возможен.  Причина: " + ex.getMessage() + "\n\n");
             parser.showHelpMessage();
         } catch (FtpClientException ex) {
             System.err.println("Ошибка взаимодействия с FTP: " + ex.getMessage() + "\n\n");
