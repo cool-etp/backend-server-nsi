@@ -24,14 +24,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = {
         NsiConfig.class
 })
-public class MsiFtpClientIntegrationTest {
+public class NsiFtpClientIntegrationTest {
     private FakeFtpServer fakeFtpServer;
 
     private NsiFtpClient ftpClient;
     private final NsiConfig config;
 
     @Autowired
-    public MsiFtpClientIntegrationTest(NsiConfig config) {
+    public NsiFtpClientIntegrationTest(NsiConfig config) {
         this.config = config;
     }
 
