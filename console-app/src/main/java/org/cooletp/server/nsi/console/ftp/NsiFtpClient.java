@@ -5,22 +5,18 @@ import lombok.Setter;
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
-import org.apache.commons.net.ftp.FTPFileFilter;
 import org.apache.commons.net.ftp.FTPReply;
 import org.cooletp.server.nsi.console.NsiConfig;
 import org.cooletp.server.nsi.console.exception.FtpClientException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,6 +70,14 @@ public class NsiFtpClient {
 
     }
 
+    /**
+     * Возвращаем список файлов на ФТП по указанному пути
+     * используем List потому как нужен доступ по индексу
+     *
+     * @param path путь на сервере относительно домашней директории
+     * @return список найденных элекментов
+     * @throws FtpClientException если что то пошло не так
+     */
     public List<String> listFiles(String path) throws FtpClientException {
         try {
             FTPFile[] files = ftpClient.listFiles(path);
@@ -97,12 +101,7 @@ public class NsiFtpClient {
     public String getLatestFile(String path) throws FtpClientException {
         try {
             // Список файлов БЕЗ директорий
-            FTPFile[] files = ftpClient.listFiles(path, new FTPFileFilter() {
-                @Override
-                public boolean accept(FTPFile ftpFile) {
-                    return ftpFile.isFile();
-                }
-            });
+            FTPFile[] files = ftpClient.listFiles(path, FTPFile::isFile);
 
             if (files.length == 0) {
                 throw new IOException("Directory " + path + " is empty!");
@@ -129,12 +128,10 @@ public class NsiFtpClient {
      */
     public List<String> getFilesForDate(String path, LocalDate date) throws FtpClientException {
         try {
-            FTPFile[] files = ftpClient.listFiles(path, new FTPFileFilter() {
-                @Override
-                public boolean accept(FTPFile ftpFile) {
-                    return ftpFile.getName().split("_")[2].equals(date.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
-                }
-            });
+            FTPFile[] files = ftpClient.listFiles(
+                    path,
+                    ftpFile -> ftpFile.getName().split("_")[2].equals(date.format(DateTimeFormatter.ofPattern("yyyyMMdd")))
+            );
 
             // Сортируем по orderNum
             Arrays.sort(files, (f1, f2) -> {
