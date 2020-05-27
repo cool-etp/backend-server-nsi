@@ -1,15 +1,8 @@
 package org.cooletp.server.nsi.console.util;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
 import org.cooletp.server.nsi.console.NsiConfig;
 import org.cooletp.server.nsi.console.exception.CliParseException;
-import org.cooletp.server.nsi.console.ftp.NsiLoaderFabric;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,12 +13,10 @@ public class CliParser {
     private Options optionList;
     private CommandLine cmd;
 
-    private final NsiLoaderFabric loaderFabric;
     private final NsiConfig config;
 
     @Autowired
-    public CliParser(NsiLoaderFabric loaderFabric, NsiConfig config) {
-        this.loaderFabric = loaderFabric;
+    public CliParser(NsiConfig config) {
         this.config = config;
     }
 
@@ -40,12 +31,20 @@ public class CliParser {
 
     public void parse(String ...args) throws CliParseException {
         try {
+            if(args.length == 0) {
+                throw new ParseException("Запуск без параметров запрещен");
+            }
+
             CommandLineParser parser = new DefaultParser();
             cmd = parser.parse(getOptionList(), args);
+
+            // Проверим что тип справочника соответствует тому, что в конфиге
+            if(isTypeCommand()) {
+                checkOptionsAllowed(getTypeValue());
+            }
         } catch (ParseException ex) {
             throw new CliParseException(ex.getMessage());
         }
-
     }
 
     public boolean isHelpCommand() {
@@ -57,7 +56,7 @@ public class CliParser {
     }
 
     public String getTypeValue() {
-        return cmd.getOptionValue("t");
+        return cmd.getOptionValue("t").toLowerCase();
     }
 
     public boolean isLoadAll() {
@@ -67,6 +66,12 @@ public class CliParser {
     public void showHelpMessage() {
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("nsi-console-app-1.0 <command> [param] [<command>]", getOptionList());
+    }
+
+    private void checkOptionsAllowed(String value) throws ParseException {
+        if( !(value.equalsIgnoreCase(config.getAllNsi()) || config.getNsiMap().keySet().stream().anyMatch(value::equalsIgnoreCase))) {
+            throw new ParseException("Выбран неверный типа NSI справочника");
+        }
     }
 
     private void defineAllowedOptions() {

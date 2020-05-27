@@ -1,6 +1,7 @@
 package org.cooletp.server.nsi.console.ftp;
 
 import org.cooletp.server.nsi.console.NsiConfig;
+import org.cooletp.server.nsi.console.exception.CliParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,8 +16,13 @@ public class NsiLoaderFabric {
         this.config = config;
     }
 
-    public NsiFtpLoader getLoader(String name) {
-        NsiFtpLoader loader = new NsiFtpLoader(client, "nsiOkato", "/out/nsi");
-        return loader;
+    public NsiFtpLoader getLoader(String name, boolean loadAll) {
+        String nsiPath = config.getNsiMap().get(name);
+
+        if(nsiPath == null) {
+            throw new CliParseException("Неверный тип NSI (".concat(name).concat(")"));
+        }
+
+        return new NsiFtpLoader(client, nsiPath, config.getNsiRootPath(), loadAll);
     }
 }

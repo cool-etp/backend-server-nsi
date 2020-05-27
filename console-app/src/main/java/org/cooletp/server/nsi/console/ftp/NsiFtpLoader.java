@@ -1,36 +1,68 @@
 package org.cooletp.server.nsi.console.ftp;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.cooletp.server.nsi.console.exception.FtpClientException;
+import org.cooletp.server.nsi.console.exception.NsiFileException;
+import org.cooletp.server.nsi.console.util.IOHelper;
 
-import java.util.Collection;
-import java.util.List;
+import java.nio.file.Paths;
 
 @Getter
-@Setter
 public class NsiFtpLoader {
-    private NsiFtpClient client;
+    private final NsiFtpClient client;
     private final String nsiPrefix;
-    private final String rootPath;
+    private final String nsiRootPath;
+    private final boolean loadAll;
 
-    public NsiFtpLoader(NsiFtpClient client, String nsiPrefix, String rootPath) {
+    private final String nsiDailyPath = "daily";
+
+    public NsiFtpLoader(NsiFtpClient client, String nsiPrefix, String nsiRootPath, boolean loadAll) {
         this.client = client;
         this.nsiPrefix = nsiPrefix;
-        this.rootPath = rootPath;
+        this.nsiRootPath = nsiRootPath;
+        this.loadAll = loadAll;
     }
 
     public void open() throws FtpClientException {
         this.getClient().open();
     }
 
-    public List<String> listFiles(String path) throws FtpClientException {
-        String fullPath = rootPath + "/" + nsiPrefix;
-
-        return getClient().listFiles(fullPath);
-    }
-
     public void close() throws FtpClientException {
         getClient().close();
+    }
+
+    public void startLoading() throws NsiFileException, FtpClientException {
+        downloadFileFromFtpToTmp(!isLoadAll());
+    }
+
+    protected void downloadFileFromFtpToTmp(boolean isDaily) throws NsiFileException, FtpClientException {
+        IOHelper.createTmpDir(getNsiPrefix());
+        String fileDir = isDaily ? getNsiStringDailyDirPath() : getNsiStringDirPath();
+
+        String fileName = getClient().getLatestFile(fileDir);
+
+        String filePathSource = Paths.get(fileDir, fileName).toString();
+
+        getClient().downloadFile(filePathSource, getTmpFilePath(fileName));
+    }
+
+    /*
+     * Путь к папке на сервере где лежат "глобальные" файлы
+     */
+    protected String getNsiStringDirPath() {
+        return Paths.get(getNsiRootPath(), getNsiPrefix()).toString();
+    }
+
+    /*
+     * Путь к папке на сервере где лежат "ежедневные" файлы
+     */
+    protected String getNsiStringDailyDirPath() {
+        return Paths.get(getNsiRootPath(), getNsiPrefix(), getNsiDailyPath()).toString();
+    }
+
+    private String getTmpFilePath(String fileName) throws NsiFileException {
+        String tmpDirName = IOHelper.getTmpDir(getNsiPrefix()).toString();
+
+        return Paths.get(tmpDirName, fileName).toString();
     }
 }

@@ -17,5 +17,7 @@ public class NsiProperties {
     private String username = "user";
     private String password = "pass";
 
-    private String nsi_list = "{}";
+    private String nsiRootPath = "/out/nsi";
+    private String nsiList = "{}";
+
 }

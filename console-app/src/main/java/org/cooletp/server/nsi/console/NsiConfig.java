@@ -1,6 +1,7 @@
 package org.cooletp.server.nsi.console;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+@Slf4j
 @Getter
 @Component
 public class NsiConfig {
@@ -28,6 +30,9 @@ public class NsiConfig {
     @Value("${cooletp.nsi.ftp.password:password}")
     private String ftpPassword;
 
+    @Value("${cooletp.nsi.ftp.nsi-root-path:/out/nsi}")
+    private String nsiRootPath;
+
     public NsiConfig() {
     }
 
@@ -37,9 +42,4 @@ public class NsiConfig {
 
         return result.keySet();
     }
-
-    public boolean isNsiTypeExists(String typeName) {
-        return (nsiMap.keySet().stream().anyMatch(t -> t.equalsIgnoreCase(typeName)) || allNsi.equalsIgnoreCase(typeName));
-    }
-
 }

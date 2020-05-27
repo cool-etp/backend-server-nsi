@@ -1,12 +1,12 @@
 package org.cooletp.server.nsi.console;
 
 import lombok.extern.slf4j.Slf4j;
-import org.cooletp.server.nsi.console.util.CliParser;
 import org.cooletp.server.nsi.console.exception.CliParseException;
 import org.cooletp.server.nsi.console.exception.FtpClientException;
 import org.cooletp.server.nsi.console.ftp.NsiFtpLoader;
-import org.cooletp.server.nsi.console.properties.NsiProperties;
 import org.cooletp.server.nsi.console.ftp.NsiLoaderFabric;
+import org.cooletp.server.nsi.console.properties.NsiProperties;
+import org.cooletp.server.nsi.console.util.CliParser;
 import org.cooletp.server.nsi.core.NsiJpaConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -48,13 +48,9 @@ public class NsiConsoleApplication implements CommandLineRunner {
                 String nsiType = parser.getTypeValue();
                 boolean loadAll = parser.isLoadAll();
 
-                if (!config.isNsiTypeExists(nsiType)) {
-                    throw new CliParseException("Выбран неверный типа NSI справочника");
-                }
-
-                NsiFtpLoader loader = nsiLoaderFabric.getLoader(nsiType);
+                NsiFtpLoader loader = nsiLoaderFabric.getLoader(nsiType, loadAll);
                 loader.open();
-                System.out.println(loader.listFiles("/out/nsi"));
+                loader.startLoading();
                 loader.close();
             } else {
                 throw new CliParseException("Необходимо указать что делать. Пустой запуск не разрешен!");
@@ -66,7 +62,5 @@ public class NsiConsoleApplication implements CommandLineRunner {
         } catch (FtpClientException ex) {
             System.err.println("Ошибка взаимодействия с FTP: " + ex.getMessage() + "\n\n");
         }
-
-
     }
 }
