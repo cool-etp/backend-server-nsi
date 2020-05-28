@@ -56,7 +56,7 @@ public class CliParser {
     }
 
     public String getTypeValue() {
-        return cmd.getOptionValue("t").toLowerCase();
+        return cmd.getOptionValue("t");
     }
 
     public boolean isLoadAll() {
@@ -69,7 +69,7 @@ public class CliParser {
     }
 
     private void checkOptionsAllowed(String value) throws ParseException {
-        if( !(value.equalsIgnoreCase(config.getAllNsi()) || config.getNsiMap().keySet().stream().anyMatch(value::equalsIgnoreCase))) {
+        if( !(value.equals(config.getAllNsi()) || config.getNsiMap().keySet().stream().anyMatch(value::equals))) {
             throw new ParseException("Выбран неверный типа NSI справочника");
         }
     }

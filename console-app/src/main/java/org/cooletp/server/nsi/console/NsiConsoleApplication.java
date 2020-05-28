@@ -3,8 +3,8 @@ package org.cooletp.server.nsi.console;
 import lombok.extern.slf4j.Slf4j;
 import org.cooletp.server.nsi.console.exception.CliParseException;
 import org.cooletp.server.nsi.console.exception.FtpClientException;
-import org.cooletp.server.nsi.console.ftp.NsiFtpLoader;
-import org.cooletp.server.nsi.console.ftp.NsiLoaderFabric;
+import org.cooletp.server.nsi.console.loader.NsiLoader;
+import org.cooletp.server.nsi.console.loader.NsiFabric;
 import org.cooletp.server.nsi.console.properties.NsiProperties;
 import org.cooletp.server.nsi.console.util.CliParser;
 import org.cooletp.server.nsi.core.NsiJpaConfiguration;
@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Import;
 )
 @EnableConfigurationProperties(NsiProperties.class)
 public class NsiConsoleApplication implements CommandLineRunner {
-    private final NsiLoaderFabric nsiLoaderFabric;
+    private final NsiFabric nsiFabric;
     private final CliParser parser;
     private final NsiConfig config;
 
@@ -31,8 +31,8 @@ public class NsiConsoleApplication implements CommandLineRunner {
     }
 
     @Autowired
-    public NsiConsoleApplication(NsiLoaderFabric nsiLoaderFabric, CliParser parser, NsiConfig config) {
-        this.nsiLoaderFabric = nsiLoaderFabric;
+    public NsiConsoleApplication(NsiFabric nsiFabric, CliParser parser, NsiConfig config) {
+        this.nsiFabric = nsiFabric;
         this.parser = parser;
         this.config = config;
     }
@@ -48,10 +48,8 @@ public class NsiConsoleApplication implements CommandLineRunner {
                 String nsiType = parser.getTypeValue();
                 boolean loadAll = parser.isLoadAll();
 
-                NsiFtpLoader loader = nsiLoaderFabric.getLoader(nsiType, loadAll);
-                loader.open();
-                loader.startLoading();
-                loader.close();
+                NsiLoader loader = nsiFabric.getLoader(nsiType, loadAll);
+                loader.downloadFromFtp();
             } else {
                 throw new CliParseException("Необходимо указать что делать. Пустой запуск не разрешен!");
             }

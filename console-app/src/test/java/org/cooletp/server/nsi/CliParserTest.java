@@ -73,7 +73,7 @@ public class CliParserTest {
 
     @Test
     public void givenCmdParams_whenRequestType_thenSayThatIsTypeCmd() {
-        parser.parse("--type", "OKATO");
+        parser.parse("-t", "OKATO");
         assertThat(parser.isTypeCommand()).isTrue();
 
         parser.parse("--type", "ALL");
@@ -94,6 +94,6 @@ public class CliParserTest {
         parser.parse("--type", "ALL", "-a");
         assertThat(parser.isTypeCommand()).isTrue();
         assertThat(parser.isLoadAll()).isTrue();
-        assertThat(parser.getTypeValue()).isEqualTo("all");
+        assertThat(parser.getTypeValue()).isEqualTo("ALL");
     }
 }
