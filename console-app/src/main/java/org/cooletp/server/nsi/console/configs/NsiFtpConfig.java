@@ -1,6 +1,7 @@
-package org.cooletp.server.nsi.console;
+package org.cooletp.server.nsi.console.configs;
 
 import lombok.Getter;
+import org.cooletp.common.ftp.IFtpProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -10,28 +11,28 @@ import java.util.Set;
 
 @Getter
 @Component
-public class NsiConfig {
+public class NsiFtpConfig implements IFtpProperties {
     private final String allNsi = "ALL";
 
     @Value("#{${cooletp.nsi.ftp.nsi-list:{:}}}")
     private Map<String, String> nsiMap;
 
     @Value("${cooletp.nsi.ftp.server:localhost}")
-    private String ftpServer;
+    private String server;
 
     @Value("${cooletp.nsi.ftp.port:21}")
-    private int ftpPort;
+    private int port;
 
     @Value("${cooletp.nsi.ftp.username:username}")
-    private String ftpUsername;
+    private String username;
 
     @Value("${cooletp.nsi.ftp.password:password}")
-    private String ftpPassword;
+    private String password;
 
     @Value("${cooletp.nsi.ftp.nsi-root-path:/out/nsi}")
     private String nsiRootPath;
 
-    public NsiConfig() {
+    public NsiFtpConfig() {
     }
 
     public Set<String> getAllowedNsiTypesNames() {

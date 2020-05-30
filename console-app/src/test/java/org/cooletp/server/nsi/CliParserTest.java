@@ -1,6 +1,6 @@
 package org.cooletp.server.nsi;
 
-import org.cooletp.server.nsi.console.NsiConfig;
+import org.cooletp.server.nsi.console.configs.NsiFtpConfig;
 import org.cooletp.server.nsi.console.exception.CliParseException;
 import org.cooletp.server.nsi.console.util.CliParser;
 import org.junit.jupiter.api.AfterEach;
@@ -12,15 +12,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = {
-        NsiConfig.class
+        NsiFtpConfig.class
 })
 public class CliParserTest {
-    private final NsiConfig config;
+    private final NsiFtpConfig config;
 
     private CliParser parser;
 
     @Autowired
-    public CliParserTest(NsiConfig config) {
+    public CliParserTest(NsiFtpConfig config) {
         this.config = config;
     }
 

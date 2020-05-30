@@ -2,12 +2,11 @@ package org.cooletp.server.nsi.console.loader;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.cooletp.server.nsi.console.exception.FtpClientException;
-import org.cooletp.server.nsi.console.exception.NsiFileException;
-import org.cooletp.server.nsi.console.ftp.NsiFtpClient;
-import org.cooletp.server.nsi.console.util.IOHelper;
+import org.cooletp.common.exception.EtpFileException;
+import org.cooletp.common.exception.EtpFtpException;
+import org.cooletp.common.ftp.EtpFtpClient;
+import org.cooletp.common.helper.IOHelper;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Slf4j
@@ -15,21 +14,21 @@ import java.nio.file.Paths;
 public class NsiLoader {
     private static final String DEFAULT_FTP_EXTENSION = ".xml.zip";
 
-    private final NsiFtpClient client;
+    private final EtpFtpClient client;
     private final String nsiPrefix;
     private final String nsiRootPath;
     private final boolean loadAll;
 
     private final String nsiDailyPath = "daily";
 
-    public NsiLoader(NsiFtpClient client, String nsiPrefix, String nsiRootPath, boolean loadAll) {
+    public NsiLoader(EtpFtpClient client, String nsiPrefix, String nsiRootPath, boolean loadAll) {
         this.client = client;
         this.nsiPrefix = nsiPrefix;
         this.nsiRootPath = nsiRootPath;
         this.loadAll = loadAll;
     }
 
-    public void downloadFromFtp() throws FtpClientException, NsiFileException {
+    public void downloadFromFtp() throws EtpFileException, EtpFtpException {
         // Откроем коннект
         getClient().open();
         // Создаем директорию временную для нужного справочника
@@ -45,12 +44,6 @@ public class NsiLoader {
         getClient().downloadFile(remoteFileFullPath, getLocalSourceTmpFilePath());
         // Закрываем коннект до ФТП сервера
         getClient().close();
-
-        log.debug("File from FTP downloaded to ".concat(getLocalSourceTmpFilePath()));
-    }
-
-    public void unzipSourceFile() {
-        
     }
 
     /*
@@ -70,16 +63,16 @@ public class NsiLoader {
     /*
      * Проверяем файл на ФТП сервере на соотвестввие нашим договоренностям (на данный момент расширение чтобы соответствовало)
      */
-    protected void checkRemoteFileName(String fileName) throws NsiFileException {
+    protected void checkRemoteFileName(String fileName) throws EtpFileException {
         if(!fileName.endsWith(DEFAULT_FTP_EXTENSION)) {
-            throw new NsiFileException("Неверное расширение у скаченного файла! (".concat(fileName.substring(fileName.indexOf(".") + 1)).concat(")"));
+            throw new EtpFileException("Неверное расширение у скаченного файла! (".concat(fileName.substring(fileName.indexOf(".") + 1)).concat(")"));
         }
     }
 
     /*
      * Полный путь к скачанному файлу на локальной машине во временной директории
      */
-    protected String getLocalSourceTmpFilePath() throws NsiFileException {
+    protected String getLocalSourceTmpFilePath() throws EtpFileException {
         String tmpDirName = IOHelper.getTmpDir(getNsiPrefix()).toString();
         String fileName = nsiPrefix.concat("_source").concat(DEFAULT_FTP_EXTENSION);
 

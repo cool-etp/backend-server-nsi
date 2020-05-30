@@ -1,7 +1,7 @@
 package org.cooletp.server.nsi.console.util;
 
 import org.apache.commons.cli.*;
-import org.cooletp.server.nsi.console.NsiConfig;
+import org.cooletp.server.nsi.console.configs.NsiFtpConfig;
 import org.cooletp.server.nsi.console.exception.CliParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,10 +13,10 @@ public class CliParser {
     private Options optionList;
     private CommandLine cmd;
 
-    private final NsiConfig config;
+    private final NsiFtpConfig config;
 
     @Autowired
-    public CliParser(NsiConfig config) {
+    public CliParser(NsiFtpConfig config) {
         this.config = config;
     }
 

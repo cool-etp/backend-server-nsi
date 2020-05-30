@@ -1,22 +1,23 @@
 package org.cooletp.server.nsi.console.loader;
 
 import lombok.extern.slf4j.Slf4j;
-import org.cooletp.server.nsi.console.NsiConfig;
+import org.cooletp.common.ftp.EtpFtpClient;
+import org.cooletp.server.nsi.console.configs.NsiFtpConfig;
 import org.cooletp.server.nsi.console.exception.CliParseException;
-import org.cooletp.server.nsi.console.ftp.NsiFtpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 public class NsiFabric {
-    private final NsiFtpClient client;
-    private final NsiConfig config;
+    private final EtpFtpClient client;
+    private final NsiFtpConfig config;
 
     @Autowired
-    public NsiFabric(NsiFtpClient client, NsiConfig config) {
-        this.client = client;
+    public NsiFabric(NsiFtpConfig config) {
         this.config = config;
+
+        this.client = new EtpFtpClient(config);
     }
 
     public NsiLoader getLoader(String name, boolean loadAll) {
