@@ -11,7 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class NsiProperties {
+public class FtpProperties {
     private String server = "localhost";
     private int port = 21;
     private String username = "user";
